@@ -39,6 +39,12 @@ Overpass is pure python password manager
         cp ./cfgsample.json $HOME/.overpass/config.json
 
 
+- *You can also try it inside docker*
+
+        docker build . -t overpass
+        docker run --rm -it overpass
+
+
 ## *Configuration*
 
     db_directory - absolute folder path where to search databases

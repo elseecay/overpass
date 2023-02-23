@@ -90,7 +90,7 @@ fail-under = 10.0
 # Files or directories to be skipped. They should be base names, not paths.
 ignore = [
     "venv", ".idea", ".vscode", "__pycache__", "overpass", "overpass.exe",
-    "test", "bench", ".github", ".gitignore", "cfgsample.json", "pyproject.toml", "requirements.txt", "README.md"
+    "test", "bench", ".github", ".gitignore", "cfgsample.json", "pyproject.toml", "requirements.txt", "README.md", "Dockerfile"
 ]
 
 # Add files or directories matching the regular expressions patterns to the
