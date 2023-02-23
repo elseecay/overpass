@@ -178,6 +178,8 @@ class AppState(metaclass=AppStateMeta):
         self.cmd_discon_backend()
         print("Disconnected")
         cfg = config.curconfig
+        if not cfg.cloud:
+            return
         if cfg.cloud.enabled and cfg.cloud.autoupload and changed_rows > 0:
             _disconnect_task_upload(self, con_info.connection_path)
 
@@ -301,6 +303,7 @@ class AppState(metaclass=AppStateMeta):
             if table.startswith(sql.content.DUMP_TABLE_PREFIX):
                 print(table[len(sql.content.DUMP_TABLE_PREFIX):])
 
+    @Arg("entry_path", "Dot separated config value path")
     @Help(Section.UTIL, "Get config entry value")
     @Command()
     def cmd_config(self, entry_path):
@@ -491,7 +494,7 @@ class AppState(metaclass=AppStateMeta):
         path = get_database_absolute_path(path, check_exist=True)
         if self.con_info.connection_abs_path == path:
             raise AppError("Cannot upload currenly connected db")
-        if not config.curconfig.get_entry("cloud/enabled"):
+        if not config.curconfig.get_entry("cloud.enabled"):
             raise AppError("Cloud service disabled")
         if service is None:
             service = config.curconfig.cloud.service

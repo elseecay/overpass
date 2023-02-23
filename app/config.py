@@ -14,10 +14,7 @@ DEV_CONFIG_PATH = Path(".overpass-dev", "config.json")
 DEFAULT_CONFIG_PATH = Path(".overpass", "config.json")
 
 
-TYPE_MAP = {
-    int: int,
-    str: str,
-    bool: bool,
+ADDITIONAL_TYPES_MAP = {
     Path: str
 }
 
@@ -30,7 +27,7 @@ class ConfigEntry:
 
     def get_entry(self, entry_path: Union[List, Tuple, str]):
         if isinstance(entry_path, str):
-            entry_path = entry_path.strip("/").split("/")
+            entry_path = entry_path.split(".")
         assert len(entry_path) >= 1
         entry_name = entry_path[0]
         entry_value = getattr(self, entry_name, None)
@@ -44,9 +41,9 @@ class ConfigEntry:
 
     def set_entry(self, entry_value, entry_path: Union[List, Tuple, str], *, full_entry_path: str = None):
         if isinstance(entry_path, str):
-            entry_path = entry_path.strip("/").split("/")
+            entry_path = entry_path.split(".")
         if full_entry_path is None:
-            full_entry_path = "/".join(entry_path)
+            full_entry_path = ".".join(entry_path)
         assert len(entry_path) >= 1
         entry_name = entry_path[0]
         if entry_name not in type(self).__annotations__:
@@ -57,7 +54,7 @@ class ConfigEntry:
                 raise ConfigError(f"Invalid entry path, path is too short, path: {full_entry_path}")
             if isinstance(entry_value, annotation_cls):
                 setattr(self, entry_name, entry_value)
-            elif isinstance(entry_value, TYPE_MAP[annotation_cls]):
+            elif annotation_cls in ADDITIONAL_TYPES_MAP and isinstance(entry_value, ADDITIONAL_TYPES_MAP[annotation_cls]):
                 setattr(self, entry_name, annotation_cls(entry_value))
             else:
                 raise ConfigError(f"Invalid entry value type, path: {full_entry_path}")
