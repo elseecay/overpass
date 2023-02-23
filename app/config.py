@@ -26,11 +26,10 @@ class ConfigError(SmartException):
 class ConfigEntry:
 
     def get_entry(self, entry_path: Union[List, Tuple, str]):
-        if isinstance(entry_path, str):
-            entry_path = entry_path.split(".")
-        assert len(entry_path) >= 1
-        entry_name = entry_path[0]
-        entry_value = getattr(self, entry_name, None)
+        entry_path = entry_path.split(".") if isinstance(entry_path, str) else entry_path
+        if len(entry_path) == 0:
+            return None
+        entry_value = getattr(self, entry_path[0], None)
         if entry_value is None:
             return None
         if len(entry_path) == 1:
@@ -39,31 +38,26 @@ class ConfigEntry:
             return None
         return entry_value.get_entry(entry_path[1:])
 
-    def set_entry(self, entry_value, entry_path: Union[List, Tuple, str], *, full_entry_path: str = None):
-        if isinstance(entry_path, str):
-            entry_path = entry_path.split(".")
-        if full_entry_path is None:
-            full_entry_path = ".".join(entry_path)
-        assert len(entry_path) >= 1
-        entry_name = entry_path[0]
-        if entry_name not in type(self).__annotations__:
-            raise ConfigError(f"Unexpected entry '{entry_name}', path: {full_entry_path}")
-        annotation_cls = type(self).__annotations__[entry_name]
+    def set_entry(self, value, entry_path: Union[List, Tuple, str], *, full_entry_path: str = None):
+        entry_path = entry_path.split(".") if isinstance(entry_path, str) else entry_path
+        full_entry_path = ".".join(entry_path) if full_entry_path is None else full_entry_path
+        if len(entry_path) == 0:
+            raise ConfigError("Empty entry path")
+        if (entry_cls := type(self).__annotations__.get(entry_name := entry_path[0], None)) is None:
+            raise ConfigError(f"Unknown entry '{entry_name}', path: {full_entry_path}")
         if len(entry_path) == 1:
-            if issubclass(annotation_cls, ConfigEntry):
-                raise ConfigError(f"Invalid entry path, path is too short, path: {full_entry_path}")
-            if isinstance(entry_value, annotation_cls):
-                setattr(self, entry_name, entry_value)
-            elif annotation_cls in ADDITIONAL_TYPES_MAP and isinstance(entry_value, ADDITIONAL_TYPES_MAP[annotation_cls]):
-                setattr(self, entry_name, annotation_cls(entry_value))
+            if value is None or isinstance(value, entry_cls):
+                setattr(self, entry_name, value)
+            elif entry_cls in ADDITIONAL_TYPES_MAP and isinstance(value, ADDITIONAL_TYPES_MAP[entry_cls]):
+                setattr(self, entry_name, entry_cls(value))
             else:
                 raise ConfigError(f"Invalid entry value type, path: {full_entry_path}")
         else:
-            if not issubclass(annotation_cls, ConfigEntry):
+            if not issubclass(entry_cls, ConfigEntry):
                 raise ConfigError(f"Invalid entry path, path is too long, path: {full_entry_path}")
             if getattr(self, entry_name, None) is None:
-                setattr(self, entry_name, annotation_cls())
-            getattr(self, entry_name).set_entry(entry_value, entry_path[1:], full_entry_path=full_entry_path)
+                setattr(self, entry_name, entry_cls())
+            getattr(self, entry_name).set_entry(value, entry_path[1:], full_entry_path=full_entry_path)
 
     def check(self):
         pass
@@ -75,6 +69,10 @@ class Dropbox(ConfigEntry):
     refresh_token_path: Path = None
 
     def check(self):
+        if self.upload_directory is None:
+            raise ConfigError("Upload directory not set")
+        if self.refresh_token_path is None:
+            raise ConfigError("Refresh token path not set")
         if not Path(self.refresh_token_path).exists():
             raise ConfigError("Dropbox refresh token path not exist")
         if not self.upload_directory.startswith("/"):
@@ -89,6 +87,10 @@ class YandexDisk(ConfigEntry):
     access_token_path: Path = None
 
     def check(self):
+        if self.upload_directory is None:
+            raise ConfigError("Upload directory not set")
+        if self.access_token_path is None:
+            raise ConfigError("Access token path not set")
         if not Path(self.access_token_path).exists():
             raise ConfigError("Yandex access token path not exist")
         if not self.upload_directory.startswith("app:/"):
@@ -105,7 +107,6 @@ class Cloud(ConfigEntry):
     enabled: bool = None
     service: str = None
     autoupload: bool = None
-
     dropbox: Dropbox = None
     yandex_disk: YandexDisk = None
 
@@ -124,10 +125,10 @@ class Cloud(ConfigEntry):
 
 @dataclass(init=False)
 class Config(ConfigEntry):
-    config_path: Path = None
     db_directory: Path = None
     default_db: Path = None
     cloud: Cloud = None
+    config_path: Path = None
 
     def check(self):
         if self.db_directory is None:
