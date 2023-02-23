@@ -1,0 +1,20 @@
+{
+    "db_directory": "",
+    "default_db": "",
+    "cloud":
+    {
+        "enabled": false,
+        "autoupload": false,
+        "service": "",
+        "dropbox":
+        {
+            "upload_directory": "",
+            "refresh_token_path": ""
+        },
+        "yandex_disk":
+        {
+            "upload_directory": "",
+            "access_token_path": ""
+        }
+    }
+}

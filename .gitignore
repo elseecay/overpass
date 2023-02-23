@@ -1,0 +1,17 @@
+*
+!*/
+
+!*.py
+!README.md
+!.gitignore
+!requirements.txt
+!cfgsample.json
+!pyproject.toml
+!README.md
+!Dockerfile
+!.github/workflows/*
+
+venv/
+__pycache__/
+.idea/
+.vscode/

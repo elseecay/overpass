@@ -1,0 +1,16 @@
+altgraph==0.17.3
+certifi==2022.12.7
+cffi==1.15.1
+charset-normalizer==3.0.1
+cryptography==39.0.0
+idna==3.4
+prompt-toolkit==3.0.36
+pycparser==2.21
+Pygments==2.14.0
+pyinstaller==5.7.0
+pyinstaller-hooks-contrib==2022.15
+pyperclip==1.8.2
+PyPika==0.48.9
+requests==2.28.2
+urllib3==1.26.14
+wcwidth==0.2.6

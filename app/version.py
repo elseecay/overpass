@@ -1,0 +1,8 @@
+"""
+VERSION = MAJOR.MINOR.PATCH
+
+
+"""
+
+
+VERSION = "0.1.0"
