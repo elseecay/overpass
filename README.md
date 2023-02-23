@@ -4,7 +4,7 @@
 
 Overpass is pure python password manager
 
-Tested with **python3.10**, should work with newer versions
+**Required python >= 3.10**
 
 
 ## *Installation*
@@ -81,6 +81,6 @@ Tested with **python3.10**, should work with newer versions
 
 ## *Plans*
 
-- *Client/Server*
-- *GUI*
-- *Mobile app*
+- Client/Server
+- GUI
+- Android app
