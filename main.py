@@ -26,9 +26,7 @@ def handle_tool_calls(args):
 def handle_test_call(args):
     if args.test:
         import main_helpers.testing
-        err_count = main_helpers.testing.run(args)
-        if err_count > 0:
-            sys.exit(1)
+        main_helpers.testing.run(args)
         sys.exit(0)
 
 

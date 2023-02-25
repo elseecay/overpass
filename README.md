@@ -39,7 +39,7 @@ Overpass is pure python password manager
         cp ./cfgsample.json $HOME/.overpass/config.json
 
 
-- *You can also try it inside docker*
+- *You can also try it inside docker container*
 
         docker build . -t overpass
         docker run --rm -it overpass
