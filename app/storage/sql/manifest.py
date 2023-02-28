@@ -41,15 +41,20 @@ def init_manifest_table(connection, mixer, key_hasher, hs_hasher):
 
 
 def check_key(connection, mixer):
-    crypted_check_bytes = decode_base64(get_record_raw(connection, MANIFEST_TABLE, KEY_COL, "key_check")[DATA_COL])
-    iv = decode_base64(get_record_raw(connection, MANIFEST_TABLE, KEY_COL, "iv_key_check")[DATA_COL])
-    check_bytes_hash = decode_base64(get_record_raw(connection, MANIFEST_TABLE, KEY_COL, "shake128_key_check")[DATA_COL])
+    crypted_check_bytes, iv, check_bytes_hash = get_key_check_data(connection)
     mixer = mixer.opp
     mixer.iv_set(iv)
     check_bytes = mixer.process(crypted_check_bytes)
     check_bytes_hash_calculated = VarHashShake128(digest_size=16).process(check_bytes)
     if check_bytes_hash_calculated != check_bytes_hash:
         raise KeyCheckError()
+
+
+def get_key_check_data(connection):
+    crypted_check_bytes = decode_base64(get_record_raw(connection, MANIFEST_TABLE, KEY_COL, "key_check")[DATA_COL])
+    iv = decode_base64(get_record_raw(connection, MANIFEST_TABLE, KEY_COL, "iv_key_check")[DATA_COL])
+    check_bytes_hash = decode_base64(get_record_raw(connection, MANIFEST_TABLE, KEY_COL, "shake128_key_check")[DATA_COL])
+    return crypted_check_bytes, iv, check_bytes_hash
 
 
 def is_db_created_by_app(connection):
