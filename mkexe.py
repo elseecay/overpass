@@ -1,6 +1,7 @@
 import subprocess
 import os
 import shutil
+import sys
 
 from pathlib import Path
 
@@ -48,7 +49,7 @@ try:
     subprocess.run(["pyinstaller", *args, "main.py"], check=True)
 except subprocess.CalledProcessError:
     print("Build failed!")
-    raise
+    sys.exit(1)
 
 
 shutil.rmtree(BUILD_DIR)
